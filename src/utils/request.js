@@ -10,21 +10,17 @@ const service = axios.create({
     // baseURL: process.env.VUE_APP_MODE === 'local' ? '/api' : process.env.VUE_APP_MODE === 'pro'? 'https://storehouse-api.chuanshui.com' : 'http://storehouse.api.chuanshui.cn',
     baseURL: process.env.VUE_APP_BASE_API,
     timeout: 10000,
-    //transformRequest 这里主要是 post请求时 请求成功了，但是后台并没有获取到前端的请求参数。如果后台是直接从请求体里取的话，请忽略
-    // transformRequest:[
-    //     data => {
-    //         let params = qs.stringify(data, {indices: false})
-    //         return params
-    //     }
-    //     ]
+    headers:{
+        "Content-Type":"application/x-www-form-urlencoded"
+    }
 });
 
 service.interceptors.request.use(
     config => {
         // console.log('getToken', getToken());
         if (getToken()){
-            config.headers['token'] = getToken();
-            config.headers['Content-Type'] = 'application/json';
+            config.headers['Authorization'] = `Bearer ${getToken()}`;
+           
         }
         return config;
     },

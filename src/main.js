@@ -16,7 +16,6 @@ import { signOut } from './utils/loginOut'
 import 'default-passive-events';
 import * as echarts from 'echarts';
 Vue.prototype.$echarts = echarts;
-
 Vue.prototype.$signOut = signOut;
 Vue.prototype.$ajax = axios;
 Vue.config.productionTip = false;

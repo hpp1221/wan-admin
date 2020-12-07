@@ -21,10 +21,10 @@ module.exports = {
     devServer: {
         proxy: {
             '/api':{
-                target:'http://storehouse.api.chuanshui.cn',
+                target:'http://47.96.4.213',
                 changeOrigin:true,
                 pathRewrite:{
-                    '/api':''
+                    '/api':'http://47.96.4.213'
                 }
             }
         }

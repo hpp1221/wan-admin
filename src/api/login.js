@@ -1,5 +1,5 @@
 import {get,post,put} from './util';
-
+import qs from 'qs';
 // // 获取配置信息
 // export const getConfigInfo = params =>post('/backend/get-index-config',params);
 
@@ -10,7 +10,7 @@ import {get,post,put} from './util';
 // export const verifyCode = params =>post('/backend/verify-captcha',params);
 
 //  登录
-export const loginApi = params =>post('/backend/user-login',params);
+export const loginApi = params =>post('/admin/user/login',qs.stringify(params));
 
 //  退出登录
 // export const loginOutApi = params =>post('/backend/user-login',params);
