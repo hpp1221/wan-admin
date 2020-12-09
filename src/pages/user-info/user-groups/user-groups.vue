@@ -9,15 +9,15 @@
       </div>
       <div class="content-wrap">
         <div
-          ref="ageChart"
+          ref="realChart"
           class="single-chart"
         ></div>
         <div
-          ref="cityChart"
+          ref="memberChart"
           class="single-chart"
         ></div>
         <div
-          ref="industryChart"
+          ref="taskChart"
           class="single-chart"
         ></div>
       </div>
@@ -28,15 +28,16 @@
 import './user-groups.less';
 // import { getConfigList, updateConfig } from '@/api/paramsConfig';
 import EmptyList from '@/components/empty-list/EmptyList';
+import { queryUserGroup } from '@/api/user';
 export default {
   name: 'UserGroups',
   data() {
     return {
       tableData: [],
       loading: false,
-      ageChart: null,
-      cityChart: null,
-      industryChart: null
+      realChart: null,
+      memberChart: null,
+      taskChart: null
     };
   },
   components: {
@@ -53,203 +54,154 @@ export default {
   methods: {
     // 获取配置列表
     getListData() {
-      this.ageChart = this.$echarts.init(this.$refs.ageChart);
-      this.cityChart = this.$echarts.init(this.$refs.cityChart);
-      this.industryChart = this.$echarts.init(this.$refs.industryChart);
-      let option = {
-        title: {
-          text: '年龄',
-          left: 'center'
-        },
-        tooltip: {
-          trigger: 'item',
-          formatter: '{a} <br/>{b} : {c} ({d}%)'
-        },
-        legend: {
-          orient: 'vertical',
-          left: 'right',
-          top: 'bottom',
-          data: ['rose1', 'rose2', 'rose3', 'rose4', 'rose5', 'rose6', 'rose7', 'rose8']
-        },
-        series: [
-          {
-            name: '年龄',
-            type: 'pie',
-            radius: [50, 80],
-            center: ['50%', '50%'],
-            roseType: 'radius',
-            label: {
-              show: false
+      this.realChart = this.$echarts.init(this.$refs.realChart);
+      this.memberChart = this.$echarts.init(this.$refs.memberChart);
+      this.taskChart = this.$echarts.init(this.$refs.taskChart);
+      const rLoading = this.openLoading();
+      queryUserGroup().then((res) => {
+        rLoading.close();
+        if (res.code === 0) {
+          const realData = res.data.real_map || [];
+          const memberData = res.data.member_map || [];
+          const taskData = res.data.task_map || [];
+          let realName = [],realList = [],
+              memberName = [],memberList = [],
+              taskName = [],taskList = [];
+          realData.forEach((ev)=>{
+            realName.push(ev.name);
+            realList.push({
+              name:ev.name,
+              value:ev.num
+            })
+          });
+          memberData.forEach((ev)=>{
+            memberName.push(ev.name);
+            memberList.push({
+              name:ev.name,
+              value:ev.num
+            })
+          });
+          taskData.forEach((ev)=>{
+            taskName.push(ev.name);
+            taskList.push({
+              name:ev.name,
+              value:ev.num
+            })
+          });
+          let option = {
+            title: {
+              text: '是否实名',
+              left: 'center'
             },
-            emphasis: {
-              label: {
-                show: true
+            tooltip: {
+              trigger: 'item',
+              formatter: '{a} <br/>{b} : {c} ({d}%)'
+            },
+            legend: {
+              orient: 'vertical',
+              left: 'right',
+              top: 'bottom',
+              data: realName
+            },
+            series: [
+              {
+                name: '是否实名',
+                type: 'pie',
+                radius: [50, 80],
+                center: ['50%', '50%'],
+                roseType: 'radius',
+                label: {
+                  show: false
+                },
+                emphasis: {
+                  label: {
+                    show: true
+                  }
+                },
+                data: realList
               }
-            },
-            data: [
-              { value: 10, name: 'rose1' },
-              { value: 5, name: 'rose2' },
-              { value: 15, name: 'rose3' },
-              { value: 25, name: 'rose4' },
-              { value: 20, name: 'rose5' },
-              { value: 35, name: 'rose6' },
-              { value: 30, name: 'rose7' },
-              { value: 40, name: 'rose8' }
             ]
-          }
-        ]
-      };
-      let cityOption = {
-        title: {
-          text: '城市',
-          left: 'center'
-        },
-        tooltip: {
-          trigger: 'item',
-          formatter: '{a} <br/>{b} : {c} ({d}%)'
-        },
-        legend: {
-          orient: 'vertical',
-          left: 'right',
-          top: 'bottom',
-          data: ['rose1', 'rose2', 'rose3', 'rose4', 'rose5', 'rose6', 'rose7', 'rose8']
-        },
-        series: [
-          {
-            name: '城市',
-            type: 'pie',
-            radius: [50, 80],
-            center: ['50%', '50%'],
-            roseType: 'radius',
-            label: {
-              show: false
+          };
+          let cityOption = {
+            title: {
+              text: '是否会员',
+              left: 'center'
             },
-            emphasis: {
-              label: {
-                show: true
+            tooltip: {
+              trigger: 'item',
+              formatter: '{a} <br/>{b} : {c} ({d}%)'
+            },
+            legend: {
+              orient: 'vertical',
+              left: 'right',
+              top: 'bottom',
+              data: memberName
+            },
+            series: [
+              {
+                name: '是否会员',
+                type: 'pie',
+                radius: [50, 80],
+                center: ['50%', '50%'],
+                roseType: 'radius',
+                label: {
+                  show: false
+                },
+                emphasis: {
+                  label: {
+                    show: true
+                  }
+                },
+                data: memberList
               }
-            },
-            data: [
-              { value: 10, name: 'rose1' },
-              { value: 50, name: 'rose2' },
-              { value: 15, name: 'rose3' },
-              { value: 25, name: 'rose4' },
-              { value: 20, name: 'rose5' },
-              { value: 35, name: 'rose6' },
-              { value: 30, name: 'rose7' },
-              { value: 40, name: 'rose8' }
             ]
-          }
-        ]
-      };
-      let industryOption = {
-        title: {
-          text: '行业',
-          left: 'center'
-        },
-        tooltip: {
-          trigger: 'item',
-          formatter: '{a} <br/>{b} : {c} ({d}%)'
-        },
-        legend: {
-          orient: 'vertical',
-          left: 'right',
-          top: 'bottom',
-          data: ['rose1', 'rose2', 'rose3', 'rose4', 'rose5', 'rose6', 'rose7', 'rose8']
-        },
-        series: [
-          {
-            name: '行业',
-            type: 'pie',
-            radius: [50, 80],
-            center: ['50%', '50%'],
-            roseType: 'radius',
-            label: {
-              show: false
+          };
+          let industryOption = {
+            title: {
+              text: '已完成任务量',
+              left: 'center'
             },
-            emphasis: {
-              label: {
-                show: true
+            tooltip: {
+              trigger: 'item',
+              formatter: '{a} <br/>{b} : {c} ({d}%)'
+            },
+            legend: {
+              orient: 'vertical',
+              left: 'right',
+              top: 'bottom',
+              data: taskName
+            },
+            series: [
+              {
+                name: '已完成任务量',
+                type: 'pie',
+                radius: [50, 80],
+                center: ['50%', '50%'],
+                roseType: 'radius',
+                label: {
+                  show: false
+                },
+                emphasis: {
+                  label: {
+                    show: true
+                  }
+                },
+                data: taskList
               }
-            },
-            data: [
-              { value: 10, name: 'rose1' },
-              { value: 5, name: 'rose2' },
-              { value: 15, name: 'rose3' },
-              { value: 25, name: 'rose4' },
-              { value: 20, name: 'rose5' },
-              { value: 35, name: 'rose6' },
-              { value: 30, name: 'rose7' },
-              { value: 40, name: 'rose8' }
             ]
-          }
-        ]
-      };
-      let sexOption = {
-        title: {
-          text: '性别',
-          left: 'center'
-        },
-        tooltip: {
-          trigger: 'item',
-          formatter: '{a} <br/>{b} : {c} ({d}%)'
-        },
-        legend: {
-          orient: 'vertical',
-          left: 'right',
-          top: 'bottom',
-          data: ['男', '女', '未知']
-        },
-        series: [
-          {
-            name: '性别',
-            type: 'pie',
-            radius: [50, 80],
-            center: ['50%', '50%'],
-            roseType: 'radius',
-            label: {
-              show: false
-            },
-            emphasis: {
-              label: {
-                show: true
-              }
-            },
-            data: [
-              { value: 100, name: '男' },
-              { value: 70, name: '女' },
-              { value: 80, name: '未知' },
-            ]
-          }
-        ]
-      };
-      this.ageChart.setOption(option);
-      this.cityChart.setOption(cityOption);
-      this.industryChart.setOption(industryOption);
-      /*const rLoading = this.openLoading();
-      let params = {};
-      getConfigList(params).then((res) => {
-          rLoading.close();
-          if(res.code === 200){
-              if(res.data){
-                  this.tableData = res.data;
-              }else {
-                  this.tableData = [];
-              }
-          }else {
-              this.$notify({
-                  title: res.msg,
-                  message: '',
-                  type: 'error',
-                  duration: 5000
-              });
-          }
-      }).catch(() => {});*/
+          };
+          this.realChart.setOption(option);
+          this.memberChart.setOption(cityOption);
+          this.taskChart.setOption(industryOption);
+        } else {
+
+        }
+      }).catch(() => {});
     },
     resizeChart() {
-      this.ageChart.resize();
-      this.cityChart.resize();
-      this.industryChart.resize();
+      this.realChart.resize();
+      this.memberChart.resize();
+      this.taskChart.resize();
     }
   }
 };

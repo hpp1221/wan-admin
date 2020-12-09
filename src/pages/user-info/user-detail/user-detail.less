@@ -127,6 +127,79 @@
       color: #52C41A;
     }
   }
+  .myTable {
+    border-collapse: collapse;
+    margin: 0 auto;
+    text-align: center;
+    width: 600px;
+  }
+  .head_img{
+    width: 80px;
+    height: 80px;
+    display: block;
+    vertical-align: middle;
+  }
+  .myTable .h100{
+    height: 100px;
+  }
+  .myTable tr{
+    //display: flex;
+    //align-items: center;
+  }
+  .myTable td,
+  .myTable th {
+    border: 1px solid #cad9ea;
+    color: #666;
+    height: 50px;
+  }
+  .marginLeft30{
+    margin-left: 30px;
+  }
+  .myTable .table-title{
+    width: 150px;
+    //display: flex;
+    //align-items: center;
+    //justify-content: center;
+  }
+  .myTable .table-content{
+    flex: 1;
+    //display: flex;
+    //align-items: center;
+    padding-left: 20px;
+    text-align: left;
+  }
+}
+.operation-record-dialog{
+  .el-form--inline .el-form-item{
+    margin-right: 25px;
+  }
+  .empty-list{
+    min-height: 300px;
+  }
+  .el-table__body-wrapper{
+    min-height: 300px;
+  }
+  // 待付款
+  .order-pending-payment {
+    background: rgba(24, 144, 255, 0.4);
+  }
+  // 已付款
+  .order-paid {
+    color: #1890ff !important;
+  }
+
+  // 已取消
+  .order-cancelled {
+    color: #ff4d4f !important;
+  }
+  // 退款中-退款成功
+  .order-refunding,
+  .order-refund-successfully {
+    color: #faad14 !important;
+  }
+  .order-successfully {
+    color: #52c41a !important;
+  }
 }
 .manual-adjust-dialog{
   .empty-list{

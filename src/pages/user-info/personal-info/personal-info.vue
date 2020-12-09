@@ -30,8 +30,10 @@
 </template>
 <script>
 import './personal-info.less';
-// import { getConfigList, updateConfig } from '@/api/paramsConfig';
+import { queryUserInfo } from '@/api/user';
 import EmptyList from '@/components/empty-list/EmptyList';
+import { loginApi } from '@/api/login';
+import { setToken } from '@/utils/auth';
 export default {
   name: 'MyselfInfo',
   data() {
@@ -47,211 +49,212 @@ export default {
   components: {
     EmptyList
   },
+  created() {
+  },
   mounted() {
     // 获取列表
-    this.getListData();
+    this.getUserData();
     window.addEventListener('resize', this.resizeChart);
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.resizeChart)
   },
   methods: {
-    // 获取配置列表
-    getListData() {
+    getUserData(){
       this.ageChart = this.$echarts.init(this.$refs.ageChart);
       this.cityChart = this.$echarts.init(this.$refs.cityChart);
       this.industryChart = this.$echarts.init(this.$refs.industryChart);
       this.sexChart = this.$echarts.init(this.$refs.sexChart);
-      let option = {
-        title: {
-          text: '年龄',
-          left: 'center'
-        },
-        tooltip: {
-          trigger: 'item',
-          formatter: '{a} <br/>{b} : {c} ({d}%)'
-        },
-        legend: {
-          orient: 'vertical',
-          left: 'right',
-          top: 'bottom',
-          data: ['rose1', 'rose2', 'rose3', 'rose4', 'rose5', 'rose6', 'rose7', 'rose8']
-        },
-        series: [
-          {
-            name: '年龄',
-            type: 'pie',
-            radius: [50, 80],
-            center: ['50%', '50%'],
-            roseType: 'radius',
-            label: {
-              show: false
+      const rLoading = this.openLoading();
+      queryUserInfo().then((res) => {
+        rLoading.close();
+        if (res.code === 0) {
+          const ageData = res.data.age_map || [];
+          const cityData = res.data.city_map || [];
+          const jobData = res.data.job_map || [];
+          const sexData = res.data.sex_map || [];
+          let ageName = [],ageList = [],
+              cityName = [],cityList = [],
+              jobName = [],jobList = [],
+              sexName = [],sexList = []
+          ;
+          console.log('ageName', ageName);
+          console.log('ageList', ageList);
+          ageData.forEach((ev)=>{
+            ageName.push(ev.name);
+            ageList.push({
+              name:ev.name,
+              value:ev.num
+            })
+          });
+          cityData.forEach((ev)=>{
+            cityName.push(ev.name);
+            cityList.push({
+              name:ev.name,
+              value:ev.num
+            })
+          });
+          jobData.forEach((ev)=>{
+            jobName.push(ev.name);
+            jobList.push({
+              name:ev.name,
+              value:ev.num
+            })
+          });
+          sexData.forEach((ev)=>{
+            sexName.push(ev.name);
+            sexList.push({
+              name:ev.name,
+              value:ev.num
+            })
+          });
+          let option = {
+            title: {
+              text: '年龄',
+              left: 'center'
             },
-            emphasis: {
-              label: {
-                show: true
+            tooltip: {
+              trigger: 'item',
+              formatter: '{a} <br/>{b} : {c} ({d}%)'
+            },
+            legend: {
+              orient: 'vertical',
+              left: 'right',
+              top: 'bottom',
+              data: ageName
+            },
+            series: [
+              {
+                name: '年龄',
+                type: 'pie',
+                radius: [50, 80],
+                center: ['50%', '50%'],
+                roseType: 'radius',
+                label: {
+                  show: false
+                },
+                emphasis: {
+                  label: {
+                    show: true
+                  }
+                },
+                data: ageList
               }
-            },
-            data: [
-              { value: 10, name: 'rose1' },
-              { value: 5, name: 'rose2' },
-              { value: 15, name: 'rose3' },
-              { value: 25, name: 'rose4' },
-              { value: 20, name: 'rose5' },
-              { value: 35, name: 'rose6' },
-              { value: 30, name: 'rose7' },
-              { value: 40, name: 'rose8' }
             ]
-          }
-        ]
-      };
-      let cityOption = {
-        title: {
-          text: '城市',
-          left: 'center'
-        },
-        tooltip: {
-          trigger: 'item',
-          formatter: '{a} <br/>{b} : {c} ({d}%)'
-        },
-        legend: {
-          orient: 'vertical',
-          left: 'right',
-          top: 'bottom',
-          data: ['rose1', 'rose2', 'rose3', 'rose4', 'rose5', 'rose6', 'rose7', 'rose8']
-        },
-        series: [
-          {
-            name: '城市',
-            type: 'pie',
-            radius: [50, 80],
-            center: ['50%', '50%'],
-            roseType: 'radius',
-            label: {
-              show: false
+          };
+          let cityOption = {
+            title: {
+              text: '城市',
+              left: 'center'
             },
-            emphasis: {
-              label: {
-                show: true
+            tooltip: {
+              trigger: 'item',
+              formatter: '{a} <br/>{b} : {c} ({d}%)'
+            },
+            legend: {
+              orient: 'vertical',
+              left: 'right',
+              top: 'bottom',
+              data: cityName
+            },
+            series: [
+              {
+                name: '城市',
+                type: 'pie',
+                radius: [50, 80],
+                center: ['50%', '50%'],
+                roseType: 'radius',
+                label: {
+                  show: false
+                },
+                emphasis: {
+                  label: {
+                    show: true
+                  }
+                },
+                data: cityList
               }
-            },
-            data: [
-              { value: 10, name: 'rose1' },
-              { value: 50, name: 'rose2' },
-              { value: 15, name: 'rose3' },
-              { value: 25, name: 'rose4' },
-              { value: 20, name: 'rose5' },
-              { value: 35, name: 'rose6' },
-              { value: 30, name: 'rose7' },
-              { value: 40, name: 'rose8' }
             ]
-          }
-        ]
-      };
-      let industryOption = {
-        title: {
-          text: '行业',
-          left: 'center'
-        },
-        tooltip: {
-          trigger: 'item',
-          formatter: '{a} <br/>{b} : {c} ({d}%)'
-        },
-        legend: {
-          orient: 'vertical',
-          left: 'right',
-          top: 'bottom',
-          data: ['rose1', 'rose2', 'rose3', 'rose4', 'rose5', 'rose6', 'rose7', 'rose8']
-        },
-        series: [
-          {
-            name: '行业',
-            type: 'pie',
-            radius: [50, 80],
-            center: ['50%', '50%'],
-            roseType: 'radius',
-            label: {
-              show: false
+          };
+          let industryOption = {
+            title: {
+              text: '行业',
+              left: 'center'
             },
-            emphasis: {
-              label: {
-                show: true
+            tooltip: {
+              trigger: 'item',
+              formatter: '{a} <br/>{b} : {c} ({d}%)'
+            },
+            legend: {
+              orient: 'vertical',
+              left: 'right',
+              top: 'bottom',
+              data: jobName
+            },
+            series: [
+              {
+                name: '行业',
+                type: 'pie',
+                radius: [50, 80],
+                center: ['50%', '50%'],
+                roseType: 'radius',
+                label: {
+                  show: false
+                },
+                emphasis: {
+                  label: {
+                    show: true
+                  }
+                },
+                data: jobList
               }
-            },
-            data: [
-              { value: 10, name: 'rose1' },
-              { value: 5, name: 'rose2' },
-              { value: 15, name: 'rose3' },
-              { value: 25, name: 'rose4' },
-              { value: 20, name: 'rose5' },
-              { value: 35, name: 'rose6' },
-              { value: 30, name: 'rose7' },
-              { value: 40, name: 'rose8' }
             ]
-          }
-        ]
-      };
-      let sexOption = {
-        title: {
-          text: '性别',
-          left: 'center'
-        },
-        tooltip: {
-          trigger: 'item',
-          formatter: '{a} <br/>{b} : {c} ({d}%)'
-        },
-        legend: {
-          orient: 'vertical',
-          left: 'right',
-          top: 'bottom',
-          data: ['男', '女', '未知']
-        },
-        series: [
-          {
-            name: '性别',
-            type: 'pie',
-            radius: [50, 80],
-            center: ['50%', '50%'],
-            roseType: 'radius',
-            label: {
-              show: false
+          };
+          let sexOption = {
+            title: {
+              text: '性别',
+              left: 'center'
             },
-            emphasis: {
-              label: {
-                show: true
+            tooltip: {
+              trigger: 'item',
+              formatter: '{a} <br/>{b} : {c} ({d}%)'
+            },
+            legend: {
+              orient: 'vertical',
+              left: 'right',
+              top: 'bottom',
+              data: sexName
+            },
+            series: [
+              {
+                name: '性别',
+                type: 'pie',
+                radius: [50, 80],
+                center: ['50%', '50%'],
+                roseType: 'radius',
+                label: {
+                  show: false
+                },
+                emphasis: {
+                  label: {
+                    show: true
+                  }
+                },
+                data: sexList
               }
-            },
-            data: [
-              { value: 100, name: '男' },
-              { value: 70, name: '女' },
-              { value: 80, name: '未知' },
             ]
-          }
-        ]
-      };
-      this.ageChart.setOption(option);
-      this.cityChart.setOption(cityOption);
-      this.industryChart.setOption(industryOption);
-      this.sexChart.setOption(sexOption);
-      /*const rLoading = this.openLoading();
-      let params = {};
-      getConfigList(params).then((res) => {
-          rLoading.close();
-          if(res.code === 200){
-              if(res.data){
-                  this.tableData = res.data;
-              }else {
-                  this.tableData = [];
-              }
-          }else {
-              this.$notify({
-                  title: res.msg,
-                  message: '',
-                  type: 'error',
-                  duration: 5000
-              });
-          }
-      }).catch(() => {});*/
+          };
+          this.ageChart.setOption(option);
+          this.cityChart.setOption(cityOption);
+          this.industryChart.setOption(industryOption);
+          this.sexChart.setOption(sexOption);
+        } else {
+
+        }
+      }).catch(() => {});
+    },
+    // 获取配置列表
+    getListData() {
     },
     resizeChart() {
       this.ageChart.resize();

@@ -18,8 +18,8 @@
 </template>
 <script>
 import './user-source.less';
-// import { getConfigList, updateConfig } from '@/api/paramsConfig';
 import EmptyList from '@/components/empty-list/EmptyList';
+import { queryUserSource } from '@/api/user';
 export default {
   name: 'userSource',
   data() {
@@ -43,64 +43,60 @@ export default {
   methods: {
     // 获取配置列表
     getListData() {
+      // queryUserSource
       this.userSourceChart = this.$echarts.init(this.$refs.userSourceChart);
-      let option = {
-        title: {
-          text: '是否邀请',
-          left: 'center'
-        },
-        tooltip: {
-          trigger: 'item',
-          formatter: '{a} <br/>{b} : {c} ({d}%)'
-        },
-        legend: {
-          orient: 'vertical',
-          left: 'right',
-          top: 'bottom',
-          data: ['邀请', '非邀请']
-        },
-        series: [
-          {
-            name: '是否邀请',
-            type: 'pie',
-            radius: [50, 80],
-            center: ['50%', '50%'],
-            roseType: 'radius',
-            label: {
-              show: false
+      const rLoading = this.openLoading();
+      queryUserSource().then((res) => {
+        rLoading.close();
+        if (res.code === 0) {
+          const inviteData = res.data.invite_map || [];
+          let inviteName = [],inviteList = [];
+          inviteData.forEach((ev)=>{
+            inviteName.push(ev.name);
+            inviteList.push({
+              name:ev.name,
+              value:ev.num
+            })
+          });
+          let option = {
+            title: {
+              text: '是否邀请',
+              left: 'center'
             },
-            emphasis: {
-              label: {
-                show: true
+            tooltip: {
+              trigger: 'item',
+              formatter: '{a} <br/>{b} : {c} ({d}%)'
+            },
+            legend: {
+              orient: 'vertical',
+              left: 'right',
+              top: 'bottom',
+              data: inviteName
+            },
+            series: [
+              {
+                name: '是否邀请',
+                type: 'pie',
+                radius: [50, 80],
+                center: ['50%', '50%'],
+                roseType: 'radius',
+                label: {
+                  show: false
+                },
+                emphasis: {
+                  label: {
+                    show: true
+                  }
+                },
+                data: inviteList
               }
-            },
-            data: [
-              { value: 10, name: '邀请' },
-              { value: 20, name: '非邀请' }
             ]
-          }
-        ]
-      };
-      this.userSourceChart.setOption(option);
-      /*const rLoading = this.openLoading();
-      let params = {};
-      getConfigList(params).then((res) => {
-          rLoading.close();
-          if(res.code === 200){
-              if(res.data){
-                  this.tableData = res.data;
-              }else {
-                  this.tableData = [];
-              }
-          }else {
-              this.$notify({
-                  title: res.msg,
-                  message: '',
-                  type: 'error',
-                  duration: 5000
-              });
-          }
-      }).catch(() => {});*/
+          };
+          this.userSourceChart.setOption(option);
+        } else {
+
+        }
+      }).catch(() => {});
     },
     resizeChart() {
       this.userSourceChart.resize();

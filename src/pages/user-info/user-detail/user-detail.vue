@@ -3,7 +3,7 @@
         <div class="container clearfix" ref="searchBox">
             <el-form :model="searchForm" :inline="true" ref="searchForm">
                 <div class="search-item-box">
-                    <el-form-item label="支付时间：" prop="pay_time" class="marginRight55">
+                    <el-form-item label="时间：" prop="pay_time" class="marginRight55">
                         <el-date-picker
                                 v-model="searchForm.pay_time"
                                 type="datetimerange"
@@ -26,7 +26,7 @@
             <div class="global-table-title">
                 <div class="title">
                     <i></i>
-                    <span>订单列表</span>
+                    <span>用户列表</span>
                 </div>
             </div>
             <el-table
@@ -35,24 +35,33 @@
                     ref="multipleTable"
                     class="user-table"
             >
-                <!--<el-table-column :fixed="tableData.length > 0" label="操作" width="120">
+                <el-table-column :fixed="tableData.length > 0" label="操作" width="200">
                     <template slot-scope="scope">
-                        <el-button type="primary" @click="handleViewDetail(scope.$index,scope.row)">查看</el-button>
-                    </template>
-                </el-table-column>-->
-                <el-table-column prop="name" label="用户名称"></el-table-column>
-                <el-table-column prop="user_detail" label="用户详情">
-                    <template slot-scope="scope">
-                        {{scope.row.user_detail}}
-                        <!--<span class="order-status">{{orderStatus(scope.row.status)}}</span>-->
+                        <el-button type="text" class="marginRight32" @click="handleViewDetail(scope.$index,scope.row)">用户详情</el-button>
+                        <el-button type="text" class="marginLeft0" @click="handleViewTaskDetail(scope.$index,scope.row)">任务详情</el-button>
                     </template>
                 </el-table-column>
+                <el-table-column prop="parent_name" label="用户名称"></el-table-column>
+                <el-table-column prop="user_detail" label="是否是会员">
+                    <template slot-scope="scope">
+                        {{scope.row.is_member>0?'会员':'非会员'}}
+                    </template>
+                </el-table-column>
+                <el-table-column prop="user_detail" label="手机号">
+                    <template slot-scope="scope">
+                        {{scope.row.phone}}
+                    </template>
+                </el-table-column>
+                <el-table-column prop="sex_cn" label="性别"></el-table-column>
                 <el-table-column prop="status" label="已完成任务/已接任务" width="200">
                     <template slot-scope="scope">
-                        <span class="task-num" :class="{'all-finished':Number(scope.row.finish_num) === Number(scope.row.all_num)}">{{scope.row.finish_num}}/{{scope.row.all_num}}</span>
+                        <span
+                            class="task-num"
+                            :class="{'all-finished':Number(scope.row.task_end_num) === Number(scope.row.task_all_num)}"
+                        >{{scope.row.task_end_num}}/{{scope.row.task_all_num}}</span>
                     </template>
                 </el-table-column>
-                <el-table-column prop="time" label="创建时间" width="180"></el-table-column>
+                <el-table-column prop="member_expire_time" label="会员过期时间" width="180"></el-table-column>
                 <template  slot="empty" >
                     <EmptyList></EmptyList>
                 </template>
@@ -71,11 +80,117 @@
                 <EmptyList></EmptyList>
             </div>
         </div>
+        <!-- 用户详情弹出框 -->
+        <el-dialog
+                title="用户详情"
+                :visible.sync="detailVisible"
+                custom-class="locking-dialog"
+                width="720px"
+                :before-close="visibleClose"
+                :destroy-on-close="true"
+        >
+            <table class="myTable" :model="userInfo" id="printTest">
+                <thead></thead>
+                <tbody>
+                <tr>
+                    <td class="table-title h100">用户头像</td>
+                    <td class="table-content h100">
+                        <img class="head_img" :src="userInfo.head_url" alt="">
+                    </td>
+                </tr>
+                <tr>
+                    <td class="table-title">用户Id</td>
+                    <td class="table-content">{{userInfo.id}}</td>
+                </tr>
+                <tr>
+                    <td class="table-title">用户昵称</td>
+                    <td class="table-content">{{userInfo.parent_name}}</td>
+                </tr>
+                <tr>
+                    <td class="table-title">注册时间及方式</td>
+                    <td class="table-content">{{userInfo.created_at}}</td>
+                </tr>
+                <tr>
+                    <td class="table-title">用户微信</td>
+                    <td class="table-content">未获取</td>
+                </tr>
+                <tr>
+                    <td class="table-title">是否会员或导师</td>
+                    <td class="table-content">
+                        <span>{{userInfo.is_member > 0 ? '会员':'非会员'}}</span>
+                        <span class="marginLeft30">{{userInfo.is_member > 0 ? '有效期至' + userInfo.member_expire_time:''}}</span>
+                        <!--<span class="marginLeft30">{{userInfo.is_member > 0 ? '导师':'非导师'}}</span>-->
+                    </td>
+                </tr>
+                <tr>
+                    <td class="table-title">任务情况</td>
+                    <td class="table-content">
+                        <span class="marginRight32">总任务数：{{userInfo.task_all_num}} </span>
+                        <span>完成任务：{{userInfo.task_end_num}}</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="table-title">上次登陆时间</td>
+                    <td class="table-content">{{userInfo.last_login_at}}</td>
+                </tr>
+                <tr>
+                    <td class="table-title">总收益</td>
+                    <td class="table-content">{{userInfo.profit_all}}元</td>
+                </tr>
+                <tr>
+                    <td class="table-title">详细信息</td>
+                    <td class="table-content">未获取</td>
+                </tr>
+                </tbody>
+            </table>
+        </el-dialog>
+        <!-- 任务详情弹出框 -->
+        <el-dialog
+                title="操作记录"
+                custom-class="operation-record-dialog"
+                :visible.sync="taskListVisible"
+                width="1080px"
+                height="600px"
+                :destroy-on-close="true"
+        >
+            <el-table v-loading="loading"
+                      :data="taskListData"
+                      ref="multipleTable" tooltip-effect="dark"
+            >
+                <el-table-column prop="status" label="状态" width="100">
+                    <template scope="scope">
+                        <span :class="orderStatusClass(scope.row.status)">
+                            {{orderStatus(scope.row.status)}}
+                        </span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="task_name" label="历史任务名"></el-table-column>
+                <el-table-column prop="user_end_num" label="完成次数" width="80"></el-table-column>
+                <el-table-column prop="new_num" label="转发次数" width="80"></el-table-column>
+                <el-table-column prop="reason_name" label="获得积分" width="80"></el-table-column>
+                <el-table-column prop="created_at" label="领取时间" width="176"></el-table-column>
+                <el-table-column prop="expire_time" label="截止时间" width="176"></el-table-column>
+                <el-table-column prop="end_time" label="结算时间" width="176"></el-table-column>
+                <template slot="empty">
+                    <EmptyList></EmptyList>
+                </template>
+            </el-table>
+            <div class="pagination pos-relative">
+                <el-pagination
+                        background
+                        layout="total, prev, pager, next"
+                        :current-page="taskPageInfo.pageIndex"
+                        :page-size="taskPageInfo.pageSize"
+                        :total="taskPageTotal"
+                        @current-change="taskPageChange"
+                ></el-pagination>
+            </div>
+        </el-dialog>
     </div>
 </template>
 
 <script>
-    // import { getOrderList } from '../../../../api/orderList';
+    import { queryUserList,queryUserDetail, queryUserTaskList } from '@/api/user';
     import EmptyList from '@/components/empty-list/EmptyList';
     import './user-detail.less';
     export default {
@@ -88,11 +203,16 @@
                 pageInfo: {
                     name: '',
                     pageIndex: 1,
-                    pageSize: 10
+                    pageSize: 15
+                },
+                taskPageInfo: {
+                    pageIndex: 1,
+                    pageSize: 15
                 },
                 loading: false,
                 tableData: [],
                 pageTotal: 0, // 总条数
+                taskPageTotal: 0, // 任务总条数
                 id: -1,
                 searchParams: {
                     paid_time_le:'',     // 结束时间
@@ -136,31 +256,49 @@
                         }
                     ]
                 },
+                detailVisible: false,
+                userInfo:{},
+                taskListVisible: false,
+                taskListData:[]
             };
         },
         components: {
             EmptyList
         },
         computed: {
-            orderStatus: function () {
-                let str = '';
-                return (data) =>{
-                    return str
-                }
+            orderStatus: function() {
+                return data => {
+                    if (data === 0) {
+                        return '待完成';
+                    } else if (data === 1) {
+                        return '已完成';
+                    } else if (data === 2) {
+                        return '已过期';
+                    } else if (data === 3) {
+                        return '违规';
+                    }
+                };
             },
+            orderStatusClass: function() {
+                return data => {
+                    if (data === 0) {
+                        return 'order-paid';
+                    } else if (data === 1) {
+                        return 'order-successfully';
+                    } else if (data === 2) {
+                        return 'order-cancelled';
+                    } else if (data === 3) {
+                        return 'order-cancelled';
+                    }
+                };
+            }
+
         },
         created() {
-            this.tableData = [
-                {name: '用户名1',user_detail:'用户详情1',finish_num: 8,all_num: 10, time:'2020-12-05'},
-                {name: '用户名2',user_detail:'用户详情2',finish_num: 10,all_num: 10, time:'2020-12-05'},
-                {name: '用户名3',user_detail:'用户详情3',finish_num: 2,all_num: 12, time:'2020-12-05'},
-                {name: '用户名4',user_detail:'用户详情4',finish_num: 1,all_num: 10, time:'2020-12-05'},
-                {name: '用户名5',user_detail:'用户详情5',finish_num: 9,all_num: 9, time:'2020-12-05'},
-            ]
         },
         mounted() {
-            // 获取订单列表数据
-            // this.getListData();
+            // 获取用户列表数据
+            this.getListData();
             // 获取搜索容器高度
             // const searchBoxHeight = this.$refs.searchBox.offsetHeight;
             // const containerHasSearch = document.getElementsByClassName('container-table-has-search')[0];
@@ -171,22 +309,19 @@
             getListData() {
                 let params = {
                     page: this.pageInfo.pageIndex,
-                    limit: this.pageInfo.pageSize,
-                    id: -1,
                     paid_time_le: this.searchParams.paid_time_le ? this.searchParams.paid_time_le : '',
                     paid_time_ge: this.searchParams.paid_time_ge ? this.searchParams.paid_time_ge: '',
                 };
                 const rLoading = this.openLoading();
-                getOrderList(params)
+                queryUserList(params)
                     .then((res) => {
                         rLoading.close();
-                        if (res.code === 200) {
-                            if (res.data.list) {
-                                this.tableData = res.data.list;
-                                this.pageTotal = res.data.total;
+                        if (res.code === 0) {
+                            if (res.data) {
+                                this.tableData = res.data.data || [];
+                                this.pageTotal = res.data.total || 0;
                             } else {
                                 this.tableData = [];
-                                this.pageTotal = 0;
                             }
                         } else {
                             this.$notify({
@@ -217,9 +352,67 @@
                 this.getListData();
             },
 
-            // 按钮-查看订单详情
+            // 按钮-查看用户详情
             handleViewDetail(index, row){
-                this.$router.push({ path: '/order-detail', query: { order_id: row.id.toString() } });
+                const params ={
+                    id:Number(row.id)
+                };
+                // this.$router.push({ path: '/order-detail', query: { order_id: row.id.toString() } });
+                const rLoading = this.openLoading();
+                queryUserDetail(params)
+                    .then((res) => {
+                        rLoading.close();
+                        if (res.code === 0) {
+                            if (res.data) {
+                                this.userInfo = res.data || {};
+                                console.log('usrInfo', this.usrInfo);
+                            } else {
+                                this.userInfo = {};
+                            }
+                            this.detailVisible = true;
+                        } else {
+                            this.$notify({
+                                title: res.msg,
+                                message: '',
+                                type: 'error',
+                                duration: 5000
+                            });
+                        }
+                    })
+                    .catch(() => {});
+            },
+
+            // 按钮-查看任务详情
+            handleViewTaskDetail(index, row){
+                const params ={
+                    uid: Number(row.id),
+                    order_no: '',
+                    page: this.taskPageInfo.pageIndex,
+                };
+                // this.$router.push({ path: '/order-detail', query: { order_id: row.id.toString() } });
+                const rLoading = this.openLoading();
+                queryUserTaskList(params)
+                    .then((res) => {
+                        rLoading.close();
+                        if (res.code === 0) {
+                            if (res.data) {
+                                this.taskListData = res.data.data || [];
+                                this.taskPageTotal = res.data.total || 0;
+                                console.log('usrInfo', this.taskListData);
+                            } else {
+                                this.taskListData = [];
+                            }
+                            this.taskListVisible = true;
+                        } else {
+                            this.$notify({
+                                title: res.msg,
+                                message: '',
+                                type: 'error',
+                                duration: 5000
+                            });
+                        }
+                    })
+                    .catch(() => {});
             },
 
             //时间格式化
@@ -255,6 +448,39 @@
                     this.$set(this.searchForm, 'pay_time', time_arr);
                 }
                 this.getListData();
+            },
+
+            taskPageChange(val) {
+                this.$set(this.taskPageInfo, 'pageIndex', val);
+                this.getListData();
+            },
+
+            visibleClose(){
+                this.detailVisible = false;
+            },
+            columnStyle({ row, column, rowIndex, columnIndex }) {
+                if (columnIndex == 0 || columnIndex == 1 || columnIndex == 3) {
+                    //第三第四列的背景色就改变了2和3都是列数的下标
+                    return "background:#f3f6fc;";
+                }else{
+                    return "background:#ffffff;";
+                }
+            },
+            // 和并列
+            objectSpanMethod({ row, column, rowIndex, columnIndex }) {
+                if (columnIndex === 0) {
+                    if (rowIndex % 4 === 0) {
+                        return {
+                            rowspan: 4,
+                            colspan: 1
+                        };
+                    } else {
+                        return {
+                            rowspan: 0,
+                            colspan: 0
+                        };
+                    }
+                }
             },
         }
     };

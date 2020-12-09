@@ -4,7 +4,8 @@ import {getToken} from './auth';
 import { Message, notify } from 'element-ui';
 import router from './../router';
 import {signOut} from './loginOut';
-
+console.log('NODE_ENV',process.env.NODE_ENV);
+console.log('process.env.VUE_APP_BASE_API========>', process.env.VUE_APP_BASE_API);
 const service = axios.create({
     // process.env.NODE_ENV === 'development' 来判断是否开发环境
     // baseURL: process.env.VUE_APP_MODE === 'local' ? '/api' : process.env.VUE_APP_MODE === 'pro'? 'https://storehouse-api.chuanshui.com' : 'http://storehouse.api.chuanshui.cn',

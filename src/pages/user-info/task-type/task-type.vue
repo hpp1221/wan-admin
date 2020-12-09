@@ -18,8 +18,8 @@
 </template>
 <script>
 import './task-type.less';
-// import { getConfigList, updateConfig } from '@/api/paramsConfig';
 import EmptyList from '@/components/empty-list/EmptyList';
+import { queryTaskType } from '@/api/user';
 export default {
   name: 'taskType',
   data() {
@@ -33,6 +33,7 @@ export default {
     EmptyList
   },
   mounted() {
+    // queryTaskType
     // 获取列表
     this.getListData();
     window.addEventListener('resize', this.resizeChart);
@@ -44,66 +45,58 @@ export default {
     // 获取配置列表
     getListData() {
       this.taskTypeChart = this.$echarts.init(this.$refs.taskTypeChart);
-      let option = {
-        title: {
-          text: '个人参与任务类型比例',
-          left: 'center'
-        },
-        tooltip: {
-          trigger: 'item',
-          formatter: '{a} <br/>{b} : {c} ({d}%)'
-        },
-        legend: {
-          orient: 'vertical',
-          left: 'right',
-          top: 'bottom',
-          data: ['游戏', '好物', '小说', '金融', '认证']
-        },
-        series: [
-          {
-            name: '个人参与任务类型比例',
-            type: 'pie',
-            radius: [50, 80],
-            center: ['50%', '50%'],
-            roseType: 'radius',
-            label: {
-              show: false
+      const rLoading = this.openLoading();
+      queryTaskType().then((res) => {
+        rLoading.close();
+        if (res.code === 0) {
+          const categoryData = res.data.category_map || [];
+          let categoryName = [],categoryList = [];
+          categoryData.forEach((ev)=>{
+            categoryName.push(ev.name);
+            categoryList.push({
+              name:ev.name,
+              value:ev.num
+            })
+          });
+          let option = {
+            title: {
+              text: '个人参与任务类型比例',
+              left: 'center'
             },
-            emphasis: {
-              label: {
-                show: true
+            tooltip: {
+              trigger: 'item',
+              formatter: '{a} <br/>{b} : {c} ({d}%)'
+            },
+            legend: {
+              orient: 'vertical',
+              left: 'right',
+              top: 'bottom',
+              data: categoryName
+            },
+            series: [
+              {
+                name: '个人参与任务类型比例',
+                type: 'pie',
+                radius: [50, 80],
+                center: ['50%', '50%'],
+                roseType: 'radius',
+                label: {
+                  show: false
+                },
+                emphasis: {
+                  label: {
+                    show: true
+                  }
+                },
+                data: categoryList
               }
-            },
-            data: [
-              { value: 10, name: '游戏' },
-              { value: 20, name: '好物' },
-              { value: 15, name: '小说' },
-              { value: 25, name: '金融' },
-              { value: 20, name: '认证' }
             ]
-          }
-        ]
-      };
-      this.taskTypeChart.setOption(option);
-      /*const rLoading = this.openLoading();
-      let params = {};
-      getConfigList(params).then((res) => {
-          rLoading.close();
-          if(res.code === 200){
-              if(res.data){
-                  this.tableData = res.data;
-              }else {
-                  this.tableData = [];
-              }
-          }else {
-              this.$notify({
-                  title: res.msg,
-                  message: '',
-                  type: 'error',
-                  duration: 5000
-              });
-          }
-      }).catch(() => {});*/
+          };
+          this.taskTypeChart.setOption(option);
+        } else {
+
+        }
+      }).catch(() => {});
     },
     resizeChart() {
       this.taskTypeChart.resize();

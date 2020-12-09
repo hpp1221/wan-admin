@@ -47,7 +47,7 @@
 </template>
 
 <script>
-import { getAuthCode, verifyCode, loginApi, getConfigInfo } from '@/api/login';
+import { loginApi } from '@/api/login';
 import { setToken, getToken } from '@/utils/auth';
 import { getUserDetail } from '@/api/user';
 import { getHasCheckedAuthList } from '@/api/role';
@@ -300,8 +300,11 @@ export default {
         }
     },
     created() {
-        this.getConfig();
+        // this.getConfig();
         this.getCookie();
+        //VUE_APP_MODE
+        console.log('VUE_APP_MODE',process.env.NODE_ENV)
+        console.log('process.env.VUE_APP_BASE_API', process.env.VUE_APP_BASE_API);
     },
     mounted() {}
 };

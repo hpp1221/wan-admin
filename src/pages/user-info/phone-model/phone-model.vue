@@ -15,6 +15,7 @@
         <div
           ref="phoneTypeChart2"
           class="single-chart"
+          style="padding-top: 20px"
         ></div>
       </div>
     </div>
@@ -24,6 +25,7 @@
 import './phone-model.less';
 // import { getConfigList, updateConfig } from '@/api/paramsConfig';
 import EmptyList from '@/components/empty-list/EmptyList';
+import { queryUserMobile } from '@/api/user';
 export default {
   name: 'PhoneModel',
   data() {
@@ -50,96 +52,87 @@ export default {
     getListData() {
       this.phoneTypeChart = this.$echarts.init(this.$refs.phoneTypeChart);
       this.phoneTypeChart2 = this.$echarts.init(this.$refs.phoneTypeChart2);
-      let option = {
-        title: {
-          text: '机型统计',
-          x:'center',      //可设定图例在左、右、居中
-          y:'top',
-        },
-        legend: {
-          x:'center',      //可设定图例在左、右、居中
-          y:'bottom',
-        },
-        tooltip: {},
-        dataset: {
-          source: [
-            ['product', '1天', '3天', '7天', '30天', '50天'],
-            ['留存数据', 1143.3, 1085.8, 893.7, 600, 480, 200]
-          ]
-        },
-        xAxis: {type: 'category'},
-        yAxis: {},
-        // Declare several bar series, each will be mapped
-        // to a column of dataset.source by default.
-        series: [
-          {type: 'bar'},
-          {type: 'bar'},
-          {type: 'bar'},
-          {type: 'bar'},
-          {type: 'bar'}
-        ]
-      };
-      let option2 = {
-        title: {
-          text: '个人参与任务类型比例',
-          left: 'center'
-        },
-        tooltip: {
-          trigger: 'item',
-          formatter: '{a} <br/>{b} : {c} ({d}%)'
-        },
-        legend: {
-          orient: 'vertical',
-          left: 'right',
-          top: 'bottom',
-          data: ['游戏', '好物', '小说', '金融', '认证']
-        },
-        series: [
-          {
-            name: '个人参与任务类型比例',
-            type: 'pie',
-            radius: [50, 80],
-            center: ['50%', '50%'],
-            roseType: 'radius',
-            label: {
-              show: false
+      // queryUserMobile
+      const rLoading = this.openLoading();
+      queryUserMobile().then((res) => {
+        rLoading.close();
+        if (res.code === 0) {
+          const UserMobileData = res.data.brand_map || [];
+          let MobileName = [],MobileList = [],XList = ['product'],YList =['留存数据'],typeList = [];
+          UserMobileData.forEach((ev)=>{
+            MobileName.push(ev.name);
+            MobileList.push({
+              name:ev.name,
+              value:ev.num
+            });
+            XList.push(ev.name);
+            YList.push(ev.num);
+            typeList.push({
+              type: 'bar'
+            })
+          });
+          let option = {
+            title: {
+              text: '机型统计',
+              x:'center',      //可设定图例在左、右、居中
+              y:'top',
             },
-            emphasis: {
-              label: {
-                show: true
+            legend: {
+              x:'center',      //可设定图例在左、右、居中
+              y:'bottom',
+            },
+            tooltip: {},
+            dataset: {
+              source: [
+                XList,
+                YList
+              ]
+            },
+            xAxis: {type: 'category'},
+            yAxis: {},
+            series: typeList
+          };
+          let option2 = {
+            title: {
+              text: '机型统计',
+              left: 'center'
+            },
+            tooltip: {
+              trigger: 'item',
+              formatter: '{a} <br/>{b} : {c} ({d}%)'
+            },
+            legend: {
+              orient: 'vertical',
+              left: 'right',
+              top: 'bottom',
+              data: MobileName
+            },
+            series: [
+              {
+                name: '个人参与任务类型比例',
+                type: 'pie',
+                radius: [50, 80],
+                center: ['50%', '50%'],
+                roseType: 'radius',
+                label: {
+                  show: false
+                },
+                emphasis: {
+                  label: {
+                    show: true
+                  }
+                },
+                data: MobileList
               }
-            },
-            data: [
-              { value: 10, name: '游戏' },
-              { value: 20, name: '好物' },
-              { value: 15, name: '小说' },
-              { value: 25, name: '金融' },
-              { value: 20, name: '认证' }
             ]
-          }
-        ]
-      };
-      this.phoneTypeChart.setOption(option);
-      this.phoneTypeChart2.setOption(option2);
-      /*const rLoading = this.openLoading();
-      let params = {};
-      getConfigList(params).then((res) => {
-          rLoading.close();
-          if(res.code === 200){
-              if(res.data){
-                  this.tableData = res.data;
-              }else {
-                  this.tableData = [];
-              }
-          }else {
-              this.$notify({
-                  title: res.msg,
-                  message: '',
-                  type: 'error',
-                  duration: 5000
-              });
-          }
-      }).catch(() => {});*/
+          };
+          this.phoneTypeChart.setOption(option);
+          this.phoneTypeChart2.setOption(option2);
+        } else {
+
+        }
+      }).catch(() => {});
+
     },
     resizeChart() {
       this.usersRetentionChart.resize();

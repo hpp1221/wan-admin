@@ -1,5 +1,4 @@
 const path = require('path');
-const resolve = dir => require("path").join(__dirname, dir);
 // const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 module.exports = {
     publicPath: './',
@@ -24,18 +23,11 @@ module.exports = {
                 target:'http://47.96.4.213',
                 changeOrigin:true,
                 pathRewrite:{
-                    '/api':'http://47.96.4.213'
+                    '/api':''
                 }
             }
         }
     },
-    configureWebpack:{
-        resolve: {
-            alias: {
-                "@": resolve("src")
-            }
-        }
-    }
     /*configureWebpack: config => {
         // if (process.env.VUE_APP_MODE === 'dev' || process.env.VUE_APP_MODE === 'local') {
             console.log('打包压缩',process.env);

@@ -97,67 +97,6 @@ export default {
               display_name: '用户详情信息及任务情况'
             },
           ]
-        },
-        {
-          icon: 'el-icon-s-home',
-          name: 'shelf-management',
-          display_name: '货架管理',
-          subs: [
-            {
-              name: 'shelf-list',
-              display_name: '货架列表'
-            }
-          ]
-        },
-        {
-          icon: 'el-icon-s-order',
-          name: 'order-management',
-          display_name: '订单管理',
-          subs: [
-            {
-              name: 'order-list',
-              display_name: '订单列表'
-            },
-            {
-              name: 'cut-cloth',
-              display_name: '裁布'
-            },
-            {
-              name: 'distribution',
-              display_name: '配货管理'
-            },
-            {
-              name: 'order-delivery',
-              display_name: '打单发货'
-            },
-            {
-              name: 'order-sent',
-              display_name: '已发订单'
-            }
-          ]
-        },
-        {
-          icon: 'el-icon-setting',
-          name: 'system-setting',
-          display_name: '系统设置',
-          subs: [
-            {
-              name: 'user-management',
-              display_name: '用户管理'
-            },
-            {
-              name: 'role-management',
-              display_name: '角色管理'
-            },
-            {
-              name: 'authority-management',
-              display_name: '权限管理'
-            },
-            {
-              name: 'parameter-configuration',
-              display_name: '参数配置'
-            },
-          ]
         }
       ],
       is_admin: 0,
